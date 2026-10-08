@@ -1,0 +1,50 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Avatar } from "@/components/AuthMenu";
+import SignOutButton from "@/components/SignOutButton";
+import { requireSession } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "আমার প্রোফাইল" };
+
+export default async function ProfilePage() {
+  const { user } = await requireSession("/profile");
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-12">
+      <h1 className="text-3xl font-bold">আমার প্রোফাইল</h1>
+      <p className="mt-1 text-muted">আপনার অ্যাকাউন্টের তথ্য এখানে দেখুন।</p>
+
+      <section className="mt-8 flex flex-col gap-5 rounded-3xl border border-line bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-5">
+          <Avatar name={user.name} image={user.image} size={80} />
+          <div className="min-w-0">
+            <h2 className="truncate text-2xl font-semibold">{user.name}</h2>
+            <p className="truncate text-muted">{user.email}</p>
+          </div>
+        </div>
+        <SignOutButton />
+      </section>
+
+      <section className="mt-6 rounded-3xl border border-line bg-card p-6">
+        <h2 className="text-lg font-semibold">তথ্য</h2>
+        <dl className="mt-4 space-y-3 text-sm">
+          <div className="flex justify-between gap-4 border-b border-line pb-3">
+            <dt className="text-muted">নাম</dt>
+            <dd className="font-medium">{user.name}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">ইমেইল</dt>
+            <dd className="font-medium break-all">{user.email}</dd>
+          </div>
+        </dl>
+        <Link
+          href="/profile/update"
+          className="mt-6 block rounded-lg bg-brand px-4 py-3 text-center font-semibold text-white shadow-md transition-colors hover:bg-brand-dark"
+        >
+          আপডেট
+        </Link>
+      </section>
+    </div>
+  );
+}
