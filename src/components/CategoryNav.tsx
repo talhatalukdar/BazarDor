@@ -18,7 +18,7 @@ export default function CategoryNav({ categories }: { categories: Category[] }) 
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   active
                     ? "bg-brand text-white shadow-sm"
                     : "text-ink hover:bg-brand-soft hover:text-brand-dark"

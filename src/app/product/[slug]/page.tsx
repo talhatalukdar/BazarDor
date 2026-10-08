@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import ChangeBadge from "@/components/ChangeBadge";
 import { getProductBySlug } from "@/lib/api";
-import {
-  formatNumberBn,
-  formatPercent,
-  formatPrice,
-  groupByDivision,
-  priceStats,
-  toBn,
-  unitLabel,
-} from "@/lib/format";
+import { formatAverage, formatNumberBn, formatPrice, priceStats, toBn, unitLabel, unitShort } from "@/lib/format";
 import { requireSession } from "@/lib/session";
-import type { Product } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -22,23 +13,16 @@ type Props = { params: Promise<{ slug: string }> };
 
 export const metadata: Metadata = { title: "পণ্যের বিস্তারিত" };
 
-function StatCard({ label, value, tone }: { label: string; value: string; tone: string }) {
+function StatCard({ label, value, note, tone }: { label: string; value: string; note: string; tone: string }) {
   return (
     <div className="rounded-2xl border border-line bg-card p-5">
       <p className="text-sm text-muted">{label}</p>
-      <p className={`mt-1 text-2xl font-bold ${tone}`}>{value}</p>
+      <p className={`mt-2 text-3xl font-bold ${tone}`}>
+        {value} <span className="text-base font-semibold">টাকা</span>
+      </p>
+      <p className="mt-2 text-sm text-muted">{note}</p>
     </div>
   );
-}
-
-function summaryLine(product: Product): string {
-  const trend =
-    product.change.dir === "up"
-      ? `গতকালের চেয়ে ${formatPercent(product.change.pct)} বেড়েছে`
-      : product.change.dir === "down"
-        ? `গতকালের চেয়ে ${formatPercent(product.change.pct)} কমেছে`
-        : "গতকালের তুলনায় দাম অপরিবর্তিত";
-  return `${product.nameBn}র আজকের দাম ${formatPrice(product.today)} (${unitLabel(product.unit)}) — ${trend}। ${toBn(product.markets.length)}টি বাজারের তথ্যের ভিত্তিতে।`;
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -51,125 +35,104 @@ export default async function ProductPage({ params }: Props) {
   if (!product) notFound();
 
   const stats = priceStats(product.markets);
-  const divisions = groupByDivision(product.markets);
-  const span = Math.max(stats.max - stats.min, 1);
+  const unit = unitLabel(product.unit).replace("প্রতি ", "");
+  const rows = product.markets
+    .map((market) => ({ ...market, avg: (market.min + market.max) / 2 }))
+    .sort((a, b) => a.avg - b.avg);
 
-  const history = [
-    { label: "গতকাল", value: product.yesterday },
-    { label: "গত সপ্তাহ", value: product.lastWeek },
-    { label: "গত মাস", value: product.lastMonth },
-  ];
+  const diff = Math.abs(product.today - product.yesterday);
+  const trendText =
+    product.change.dir === "flat" || diff === 0 ? (
+      "গতকালের তুলনায় আজ দাম অপরিবর্তিত"
+    ) : (
+      <>
+        গতকালের তুলনায় আজ দাম <strong>{product.change.dir === "up" ? "বেড়েছে" : "কমেছে"}</strong> ·{" "}
+        {toBn(diff)} টাকা
+      </>
+    );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <Link
-        href={`/category/${product.category}`}
-        className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-brand"
-      >
-        <ArrowLeft aria-hidden="true" className="size-4" /> {product.categoryNameBn} ক্যাটাগরিতে ফিরে যান
-      </Link>
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+      <nav aria-label="breadcrumb">
+        <ol className="flex flex-wrap items-center gap-2 text-sm">
+          <li>
+            <Link href="/" className="hover:text-brand">হোম</Link>
+          </li>
+          <ChevronRight aria-hidden="true" className="size-4" />
+          <li>
+            <Link href={`/category/${product.category}`} className="hover:text-brand">
+              {product.categoryNameBn}
+            </Link>
+          </li>
+          <ChevronRight aria-hidden="true" className="size-4" />
+          <li aria-current="page">{product.nameBn}</li>
+        </ol>
+      </nav>
 
-      <section className="rounded-3xl border border-line bg-card p-6 sm:p-8">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-start gap-5">
-            <span
-              aria-hidden="true"
-              className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-surface text-5xl"
-            >
-              {product.image}
-            </span>
-            <div>
-              <h1 className="text-3xl font-bold sm:text-4xl">{product.nameBn}</h1>
-              <p className="mt-2 max-w-2xl text-muted">{summaryLine(product)}</p>
-              <ul className="mt-4 flex flex-wrap gap-2 text-sm" aria-label="ক্যাটাগরি ও একক">
-                <li>
-                  <Link
-                    href={`/category/${product.category}`}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 font-medium text-brand-dark hover:bg-brand hover:text-white"
-                  >
-                    <span aria-hidden="true">{product.categoryIcon}</span>
-                    {product.categoryNameBn}
-                  </Link>
-                </li>
-                <li className="rounded-full bg-surface px-3 py-1 font-medium ring-1 ring-line">
-                  {unitLabel(product.unit)}
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="md:text-right">
-            <p className="text-sm text-muted">আজকের দাম</p>
-            <p className="text-4xl font-bold">{formatPrice(product.today)}</p>
-            <div className="mt-2 md:flex md:justify-end">
-              <ChangeBadge change={product.change} />
-            </div>
+      <section className="flex flex-col gap-6 rounded-2xl border border-line bg-card p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-6">
+          <span
+            aria-hidden="true"
+            className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-surface text-5xl sm:size-24"
+          >
+            {product.image}
+          </span>
+          <div className="min-w-0">
+            <h1 className="text-3xl font-bold sm:text-4xl">{product.nameBn}</h1>
+            <p className="mt-1 text-muted">
+              {unitLabel(product.unit)} · {product.categoryNameBn}
+            </p>
+            <p className="mt-3">{trendText}</p>
           </div>
         </div>
-
-        <dl className="mt-8 grid grid-cols-3 gap-3 border-t border-line pt-6 text-center">
-          {history.map((item) => (
-            <div key={item.label}>
-              <dt className="text-sm text-muted">{item.label}</dt>
-              <dd className="mt-1 font-semibold">{formatPrice(item.value)}</dd>
-            </div>
-          ))}
-        </dl>
+        <div className="flex flex-col items-center rounded-2xl bg-surface px-8 py-5 text-center">
+          <p className="text-sm text-muted">আজকের দাম</p>
+          <p className="text-4xl font-bold">{formatNumberBn(product.today)}</p>
+          <p className="mt-1 text-sm text-muted">টাকা / {unitShort(product.unit)}</p>
+          <div className="mt-2">
+            <ChangeBadge change={product.change} />
+          </div>
+        </div>
       </section>
 
-      <section className="mt-10" aria-labelledby="price-summary">
-        <h2 id="price-summary" className="mb-4 text-2xl font-bold">
+      <section aria-labelledby="price-summary" className="rounded-2xl border border-line bg-card p-6 sm:p-8">
+        <h2 id="price-summary" className="mb-5 text-xl font-bold">
           দামের সারসংক্ষেপ
         </h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard label="সর্বনিম্ন দাম" value={formatPrice(stats.min)} tone="text-fall" />
-          <StatCard label="সর্বোচ্চ দাম" value={formatPrice(stats.max)} tone="text-rise" />
-          <StatCard label="গড় দাম" value={formatPrice(stats.avg)} tone="text-ink" />
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatCard label="সর্বনিম্ন দাম" value={formatNumberBn(stats.min)} note="সবচেয়ে কম দামের বাজার" tone="text-fall" />
+          <StatCard label="সর্বাধিক দাম" value={formatNumberBn(stats.max)} note="সবচেয়ে বেশি দামের বাজার" tone="text-rise" />
+          <StatCard label="গড় দাম" value={formatNumberBn(stats.avg)} note={`প্রতি ${unit}-এর হিসাবে`} tone="text-fall" />
         </div>
       </section>
 
-      <section className="mt-10" aria-labelledby="market-prices">
-        <h2 id="market-prices" className="mb-4 text-2xl font-bold">
+      <section aria-labelledby="market-prices" className="rounded-2xl border border-line bg-card p-6 sm:p-8">
+        <h2 id="market-prices" className="mb-5 text-xl font-bold">
           বাজারভিত্তিক আজকের দাম
         </h2>
-        <div className="space-y-8">
-          {divisions.map(([division, markets]) => (
-            <div key={division}>
-              <h3 className="mb-3 text-lg font-semibold text-brand-dark">{division} বিভাগ</h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {markets.map((market) => {
-                  const left = ((market.min - stats.min) / span) * 100;
-                  const width = Math.max(((market.max - market.min) / span) * 100, 3);
-                  return (
-                    <article
-                      key={`${division}-${market.market}`}
-                      className="rounded-2xl border border-line bg-card p-5"
-                    >
-                      <h4 className="font-semibold">{market.market}</h4>
-                      <div className="mt-3 flex justify-between text-sm">
-                        <span>
-                          <span className="text-muted">সর্বনিম্ন </span>
-                          <strong className="text-fall">{formatNumberBn(market.min)} টাকা</strong>
-                        </span>
-                        <span>
-                          <span className="text-muted">সর্বোচ্চ </span>
-                          <strong className="text-rise">{formatNumberBn(market.max)} টাকা</strong>
-                        </span>
-                      </div>
-                      <div
-                        aria-hidden="true"
-                        className="relative mt-3 h-2 overflow-hidden rounded-full bg-surface"
-                      >
-                        <span
-                          className="absolute inset-y-0 rounded-full bg-brand"
-                          style={{ left: `${left}%`, width: `${Math.min(width, 100 - left)}%` }}
-                        />
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto rounded-2xl border border-line">
+          <table className="w-full min-w-[560px] text-left">
+            <thead>
+              <tr className="text-muted">
+                <th scope="col" className="px-5 py-4 font-medium">বাজার</th>
+                <th scope="col" className="px-5 py-4 font-medium">বিভাগ</th>
+                <th scope="col" className="px-5 py-4 text-right font-medium">সর্বনিম্ন</th>
+                <th scope="col" className="px-5 py-4 text-right font-medium">সর্বাধিক</th>
+                <th scope="col" className="px-5 py-4 text-right font-medium">গড়</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={`${row.division}-${row.market}`} className="border-t border-ink/70 odd:bg-card even:bg-surface">
+                  <th scope="row" className="px-5 py-4 font-medium">{row.market}</th>
+                  <td className="px-5 py-4">{row.division}</td>
+                  <td className="px-5 py-4 text-right">{formatPrice(row.min)}</td>
+                  <td className="px-5 py-4 text-right">{formatPrice(row.max)}</td>
+                  <td className="px-5 py-4 text-right font-bold">{formatAverage(row.avg)} টাকা</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>

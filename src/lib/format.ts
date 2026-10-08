@@ -88,3 +88,11 @@ export function groupByDivision(markets: MarketPrice[]): [string, MarketPrice[]]
   }
   return [...groups.entries()];
 }
+
+/** Integers stay clean (৬২); fractions show two decimals (৬৩.৫০), as in the design. */
+export function formatAverage(value: number): string {
+  if (Number.isInteger(value)) return formatNumberBn(value);
+  return toBn(
+    new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value),
+  );
+}

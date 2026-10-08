@@ -8,6 +8,8 @@ import { ChevronDown, LogOut, User } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 
 export function Avatar({ name, image, size = 36 }: { name: string; image?: string | null; size?: number }) {
+  // Soft rounded box (not a full circle): gentler corners on small avatars, larger on big ones.
+  const shape = size >= 64 ? "rounded-2xl" : "rounded-lg";
   if (image) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- provider avatars come from arbitrary hosts
@@ -17,7 +19,7 @@ export function Avatar({ name, image, size = 36 }: { name: string; image?: strin
         width={size}
         height={size}
         referrerPolicy="no-referrer"
-        className="rounded-full object-cover"
+        className={`${shape} object-cover ring-1 ring-line`}
         style={{ width: size, height: size }}
       />
     );
@@ -25,7 +27,7 @@ export function Avatar({ name, image, size = 36 }: { name: string; image?: strin
   return (
     <span
       aria-hidden="true"
-      className="inline-flex items-center justify-center rounded-full bg-brand font-semibold text-white"
+      className={`inline-flex items-center justify-center ${shape} bg-brand font-semibold text-white`}
       style={{ width: size, height: size }}
     >
       {name.trim().charAt(0).toUpperCase() || "?"}
@@ -95,7 +97,7 @@ export default function AuthMenu() {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 hover:bg-brand-soft"
+        className="flex items-center gap-2 rounded-xl py-1 pr-2 pl-1 hover:bg-brand-soft"
       >
         <Avatar name={name} image={image} />
         <span className="max-w-24 truncate text-sm font-medium sm:max-w-40">{firstName}</span>
