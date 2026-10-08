@@ -46,8 +46,8 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
-    // After sign-up the user is sent to the sign-in page (assignment requirement).
-    autoSignIn: false,
+    // autoSignIn stays on (default): with it off, Better Auth hides duplicate emails behind a
+    // generic success response. SignUpForm signs the new session out and sends the user to /signin.
   },
   socialProviders,
   // nextCookies must stay the last plugin.

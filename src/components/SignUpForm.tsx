@@ -45,6 +45,8 @@ export default function SignUpForm({ callbackUrl }: { callbackUrl: string }) {
       setPending(false);
       return;
     }
+    // Better Auth signs new users in automatically; the assignment wants them to log in explicitly.
+    await authClient.signOut();
     toast.success("অ্যাকাউন্ট তৈরি হয়েছে! এবার সাইন ইন করুন");
     router.push(
       callbackUrl === "/" ? "/signin" : `/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`,
