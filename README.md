@@ -11,7 +11,7 @@ Built for **Programming Hero – Batch 14, Assignment 7**.
 
 1. **Live price board** – a home page with an infinite-scrolling price ticker, the top 6 risers (▲), the top 6 fallers (▼) and a responsive grid of all products, with Bengali numerals and green / red / gray change badges.
 2. **Category browsing** – a category page for every product group, with an active-link navbar, a numeric price sort (ডিফল্ট / কম থেকে বেশি / বেশি থেকে কম) and skeleton loaders while data loads.
-3. **Protected product details** – `/product/[slug]` requires login and shows min / max / average price plus market-wise prices grouped by division. The guard runs on the server (real `307` redirect), not just in the UI.
+3. **Protected product details** – `/product/[slug]` requires login and shows a breadcrumb, today's price with change, min / max / average price cards and a market-wise price table (market, division, min, max, average). The guard runs on the server (real `307` redirect), not just in the UI.
 4. **Authentication with Better Auth** – email + password, Google and GitHub sign-in, validation, toast feedback, a profile page, and a name-update route.
 5. **Resilient and responsive** – works from 320px phones to desktops, friendly 404 / error states, automatic fallback to a second API host, and dynamic routes that survive a hard refresh on Vercel.
 
@@ -32,7 +32,7 @@ Built for **Programming Hero – Batch 14, Assignment 7**.
 | --- | --- | --- |
 | `/` | Public | Hero, risers, fallers, all products (`#সব-পণ্য`) |
 | `/category/[slug]` | Public | Products of one category with sorting |
-| `/product/[slug]` | **Login required** | Price summary and market-wise prices |
+| `/product/[slug]` | **Login required** | Price summary and market-wise price table |
 | `/signin`, `/signup` | Public (redirects if signed in) | Email + Google + GitHub auth |
 | `/profile` | **Login required** | Account info and sign-out |
 | `/profile/update` | **Login required** | Update display name |
@@ -89,6 +89,7 @@ All requests go through `src/lib/api.ts`, which validates responses, caches for 
 - Better Auth handles sessions with secure cookies; the handler lives at `/api/auth/[...all]`.
 - Protected pages call `requireSession()` (`src/lib/session.ts`) on the server and redirect to `/signin?callbackUrl=…`, where a toast explains that login is required.
 - After sign-up the user is signed out and sent to `/signin`, as the assignment asks.
+- The profile page links to `/profile/update`, where the display name is changed with Better Auth's `updateUser`; the user is then returned to `/profile`.
 - Email verification and forgot-password are intentionally not implemented.
 
 ## ☁️ Deployment (Vercel)
@@ -109,6 +110,3 @@ src/
 ```
 
 ## 🧮 Notes on the numbers
-
-- Prices are stored and sorted as real numbers; Bengali digits are applied only when formatting.
-- On the detail page, **min** is the lowest market minimum, **max** the highest market maximum, and **average** the mean of each market's midpoint price.
