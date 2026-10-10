@@ -11,3 +11,16 @@ export function authErrorMessage(error: { code?: string; message?: string } | nu
   if (code.includes("PROVIDER_NOT_FOUND")) return "এই সোশ্যাল লগইন এখনো চালু করা হয়নি";
   return error?.message || "কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন";
 }
+
+/** Friendly text for the ?error=... code Better Auth appends after a failed social login. */
+export function oauthErrorMessage(code: string): string {
+  const key = code.toLowerCase();
+  if (key.includes("account_not_linked")) {
+    return "এই ইমেইল দিয়ে আগে অন্য পদ্ধতিতে অ্যাকাউন্ট খোলা হয়েছে। আগের পদ্ধতিতে সাইন ইন করুন";
+  }
+  if (key.includes("state") || key.includes("please_restart")) {
+    return "লগইন সেশন মেলেনি, আবার চেষ্টা করুন";
+  }
+  if (key.includes("access_denied")) return "আপনি অনুমতি দেননি, তাই লগইন হয়নি";
+  return `সোশ্যাল লগইন ব্যর্থ হয়েছে (${code})`;
+}

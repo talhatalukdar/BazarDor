@@ -31,7 +31,11 @@ export default function SocialButtons({ callbackUrl = "/" }: { callbackUrl?: str
 
   async function handleSocial(provider: Provider) {
     setPending(provider);
-    const { error } = await authClient.signIn.social({ provider, callbackURL: callbackUrl });
+    const { error } = await authClient.signIn.social({
+      provider,
+      callbackURL: callbackUrl,
+      errorCallbackURL: "/signin",
+    });
     // On success the browser is redirected to the provider, so we only handle failures here.
     if (error) {
       toast.error(authErrorMessage(error));

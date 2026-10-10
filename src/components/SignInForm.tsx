@@ -8,26 +8,29 @@ import FormField from "@/components/FormField";
 import SocialButtons from "@/components/SocialButtons";
 import SubmitButton from "@/components/SubmitButton";
 import { authClient } from "@/lib/auth-client";
-import { authErrorMessage } from "@/lib/auth-errors";
+import { authErrorMessage, oauthErrorMessage } from "@/lib/auth-errors";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface Props {
   callbackUrl: string;
   protectedRedirect: boolean;
+  oauthError?: string;
 }
 
-export default function SignInForm({ callbackUrl, protectedRedirect }: Props) {
+export default function SignInForm({ callbackUrl, protectedRedirect, oauthError }: Props) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   useEffect(() => {
-    if (protectedRedirect) {
+    if (oauthError) {
+      toast.error(oauthErrorMessage(oauthError), { id: "oauth-error", duration: 7000 });
+    } else if (protectedRedirect) {
       // Fixed id prevents a duplicate toast under React StrictMode.
       toast.error("এই পেজ দেখতে আগে সাইন ইন করুন", { id: "protected-route" });
     }
-  }, [protectedRedirect]);
+  }, [protectedRedirect, oauthError]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
