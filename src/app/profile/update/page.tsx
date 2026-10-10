@@ -11,7 +11,7 @@ export default async function UpdateProfilePage() {
 
   return (
     <AuthShell title="তথ্য আপডেট করুন" subtitle="আপনার নাম পরিবর্তন করে সংরক্ষণ করুন।">
-      <UpdateProfileForm currentName={user.name} />
+      <UpdateProfileForm currentName={user.name} currentImage={user.image} />
     </AuthShell>
   );
 }
