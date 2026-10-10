@@ -1,112 +1,221 @@
 # 🛒 বাজার দর (BazarDor)
 
-**প্রয়োজনীয় পণ্যের দাম এক নজরে।** BazarDor is a Bangladeshi essentials price-tracking website. It shows today's market price of rice, lentils, oil, vegetables, fish, meat, dairy and spices, how much each price moved since yesterday, and a market-by-market breakdown for every product.
+**প্রয়োজনীয় পণ্যের দাম এক নজরে।**
+
+BazarDor is a Bangladeshi essentials price-tracking web application that helps users explore current market prices of everyday products, compare price changes, and view market-wise price breakdowns across Bangladesh.
 
 Built for **Programming Hero – Batch 14, Assignment 7**.
 
-- 🌐 **Live site:** _add your Vercel URL here_
-- 📦 **Repository:** _add your GitHub URL here_
+- 🌐 **Live Site:** https://bazardor-snowy.vercel.app/
+- 📦 **Repository:** https://github.com/talhatalukdar/BazarDor
 
 ## ✨ Key Features
 
-1. **Live price board** – a home page with an infinite-scrolling price ticker, the top 6 risers (▲), the top 6 fallers (▼) and a responsive grid of all products, with Bengali numerals and green / red / gray change badges.
-2. **Category browsing** – a category page for every product group, with an active-link navbar, a numeric price sort (ডিফল্ট / কম থেকে বেশি / বেশি থেকে কম) and skeleton loaders while data loads.
-3. **Protected product details** – `/product/[slug]` requires login and shows a breadcrumb, today's price with change, min / max / average price cards and a market-wise price table (market, division, min, max, average). The guard runs on the server (real `307` redirect), not just in the UI.
-4. **Authentication with Better Auth** – email + password, Google and GitHub sign-in, validation, toast feedback, a profile page, and a name-update route.
-5. **Resilient and responsive** – works from 320px phones to desktops, friendly 404 / error states, automatic fallback to a second API host, and dynamic routes that survive a hard refresh on Vercel.
+1. **Live Price Board** — Browse everyday essentials with an infinite-scrolling price ticker, top price risers and fallers, and a responsive product grid. Price changes use color-coded indicators and Bengali numerals.
+2. **Category Browsing** — Explore products by category, navigate with active-link indicators, sort prices from low to high or high to low, and view loading skeletons while data loads.
+3. **Protected Product Details** — Authenticated users can view a breadcrumb, today's price with its change, minimum / maximum / average price cards, and a market-wise price table (market, division, minimum, maximum, average). Access is protected through server-side session checks.
+4. **Multiple Authentication Options** — Sign up and sign in using email and password, Google, or GitHub, powered by Better Auth.
+5. **Profile Management** — View account information, update your display name through a dedicated profile update page using Better Auth's `updateUser`, and sign out securely.
+6. **Form Validation and Feedback** — Get validation messages and toast notifications for authentication and profile actions.
+7. **Responsive User Interface** — Designed for mobile phones, tablets, and desktops, with friendly error and not-found pages.
+8. **Resilient API Integration** — Validates API responses, caches data for five minutes, and supports a fallback API host when the primary host fails.
+9. **Production-Ready Routing** — Supports dynamic routes and direct page refreshes on Vercel.
 
-## 🧰 Technologies
+## 🧰 Tech Stack
 
-| Area | Tech |
-| --- | --- |
-| Framework | Next.js 16 (App Router), React 19 |
+| Area | Technologies |
+|---|---|
+| Framework | Next.js 16, App Router |
+| UI Library | React 19 |
 | Language | TypeScript |
-| Styling | Tailwind CSS v4, Hind Siliguri (Bengali font) |
-| Auth | Better Auth + MongoDB adapter |
-| UI | react-hot-toast, lucide-react |
-| Data | BazarDor REST API (Cloudflare Workers) |
+| Styling | Tailwind CSS v4 |
+| Font | Hind Siliguri |
+| Authentication | Better Auth |
+| Database | MongoDB Atlas |
+| Notifications | react-hot-toast |
+| Icons | lucide-react |
+| Data Source | BazarDor REST API |
+| Deployment | Vercel |
 
-## 🗺️ Routes
+## 🗺️ Application Routes
 
-| Route | Access | Purpose |
-| --- | --- | --- |
-| `/` | Public | Hero, risers, fallers, all products (`#সব-পণ্য`) |
-| `/category/[slug]` | Public | Products of one category with sorting |
-| `/product/[slug]` | **Login required** | Price summary and market-wise price table |
-| `/signin`, `/signup` | Public (redirects if signed in) | Email + Google + GitHub auth |
-| `/profile` | **Login required** | Account info and sign-out |
-| `/profile/update` | **Login required** | Update display name |
-| any other URL | – | Friendly 404 with "হোম পেজে ফিরে যান" |
+| Route | Access | Description |
+|---|---|---|
+| `/` | Public | Homepage, price ticker, risers, fallers, and all products |
+| `/category/[slug]` | Public | Browse and sort products by category |
+| `/product/[slug]` | Login required | Product price summary and market-wise price table |
+| `/signin` | Public | Sign in with email/password, Google, or GitHub |
+| `/signup` | Public | Create an account |
+| `/profile` | Login required | View account details and sign out |
+| `/profile/update` | Login required | Update your display name |
+| Any unmatched route | Public | Custom 404 page with a link back to the homepage |
 
 ## 🚀 Getting Started
 
+### Prerequisites
+
+- Node.js (LTS recommended)
+- npm
+- MongoDB Atlas account
+- Google and/or GitHub OAuth credentials if you want to enable social login locally
+
+### Installation
+
 ```bash
-git clone <your-repo-url>
-cd bazardor
+git clone https://github.com/talhatalukdar/BazarDor.git
+cd BazarDor
 npm install
-cp .env.example .env.local   # then fill in the values below
-npm run dev                  # http://localhost:3000
 ```
 
-Other commands:
+Create a local environment file:
 
 ```bash
-npm run lint    # ESLint
-npm run build   # production build
-npm run start   # run the production build
+cp .env.example .env.local
 ```
 
-### Environment variables
+Configure the required environment variables in `.env.local`, then start the development server:
 
-| Variable | Required | Notes |
-| --- | --- | --- |
-| `BETTER_AUTH_SECRET` | ✅ | Random string, e.g. `openssl rand -base64 32` |
-| `BETTER_AUTH_URL` | ✅ | `http://localhost:3000` locally, your Vercel URL in production |
-| `MONGODB_URI` | ✅ | MongoDB Atlas connection string (free tier is enough) |
-| `MONGODB_DB` | – | Database name, defaults to `bazardor` |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | for Google login | Redirect URI: `{BETTER_AUTH_URL}/api/auth/callback/google` |
-| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | for GitHub login | Callback URL: `{BETTER_AUTH_URL}/api/auth/callback/github` |
-| `BAZARDOR_API_URL`, `BAZARDOR_API_FALLBACK_URL` | – | Override the API hosts |
+```bash
+npm run dev
+```
 
-Never commit `.env.local`; only `.env.example` is tracked.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 🔌 API
+### Available Scripts
 
-Base URL: `https://api.api-store.workers.dev/api/bazardor` (fallback: `https://api.abcz.workers.dev/api/bazardor`)
+```bash
+npm run dev     # Start the development server
+npm run lint    # Run ESLint
+npm run build   # Build for production
+npm run start   # Start the production server
+```
+
+## ⚙️ Environment Variables
+
+Configure the following variables in `.env.local` for local development and in Vercel for deployment.
+
+| Variable | Required | Description |
+|---|---|---|
+| `BETTER_AUTH_SECRET` | Yes | Secret used by Better Auth |
+| `BETTER_AUTH_URL` | Yes | Application base URL |
+| `MONGODB_URI` | Yes | MongoDB Atlas connection string |
+| `MONGODB_DB` | No | Database name; defaults to `bazardor` |
+| `GOOGLE_CLIENT_ID` | For Google login | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | For Google login | Google OAuth client secret |
+| `GITHUB_CLIENT_ID` | For GitHub login | GitHub OAuth app client ID |
+| `GITHUB_CLIENT_SECRET` | For GitHub login | GitHub OAuth app client secret |
+| `BAZARDOR_API_URL` | No | Override the primary API host |
+| `BAZARDOR_API_FALLBACK_URL` | No | Override the fallback API host |
+
+For local development, set `BETTER_AUTH_URL` to:
+
+```env
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+For production, set it to your deployed application URL:
+
+```env
+BETTER_AUTH_URL=https://bazardor-snowy.vercel.app
+```
+
+### OAuth Callback URLs
+
+Register the following callback URLs with the corresponding OAuth providers.
+
+**Google OAuth:**
+
+```text
+https://bazardor-snowy.vercel.app/api/auth/callback/google
+```
+
+**GitHub OAuth:**
+
+```text
+https://bazardor-snowy.vercel.app/api/auth/callback/github
+```
+
+For local testing, also add the `http://localhost:3000/api/auth/callback/...` equivalents. Replace the domain if your primary production domain changes. Never commit `.env.local` or expose OAuth client secrets in source control.
+
+## 🔌 REST API
+
+**Primary API Base URL:**
+
+`https://api.api-store.workers.dev/api/bazardor`
+
+**Fallback API Base URL:**
+
+`https://api.abcz.workers.dev/api/bazardor`
 
 | Endpoint | Description |
-| --- | --- |
-| `/categories` | All categories |
-| `/categories/:id` | One category |
-| `/products` | All products |
-| `/products?category=chal` | Products of a category |
-| `/products/:id` | One product |
+|---|---|
+| `/categories` | Retrieve all categories |
+| `/categories/:id` | Retrieve a specific category |
+| `/products` | Retrieve all products |
+| `/products?category=chal` | Retrieve products filtered by category |
+| `/products/:id` | Retrieve a specific product |
 
-All requests go through `src/lib/api.ts`, which validates responses, caches for 5 minutes and switches to the fallback host if the primary one fails.
+API requests are handled through `src/lib/api.ts`. The API utility validates responses, caches data for five minutes, and can switch to the fallback host when the primary host fails.
 
-## 🔐 Authentication notes
+## 🔐 Authentication and Security
 
-- Better Auth handles sessions with secure cookies; the handler lives at `/api/auth/[...all]`.
-- Protected pages call `requireSession()` (`src/lib/session.ts`) on the server and redirect to `/signin?callbackUrl=…`, where a toast explains that login is required.
-- After sign-up the user is signed out and sent to `/signin`, as the assignment asks.
-- The profile page links to `/profile/update`, where the display name is changed with Better Auth's `updateUser`; the user is then returned to `/profile`.
-- Email verification and forgot-password are intentionally not implemented.
+- Better Auth manages authentication and sessions through `/api/auth/[...all]`.
+- Supported sign-in methods include email/password, Google, and GitHub.
+- Protected pages perform server-side session checks through `requireSession()` in `src/lib/session.ts`.
+- Unauthenticated users accessing protected pages are redirected to `/signin?callbackUrl=…`, where a toast explains that login is required.
+- Signed-in users can view their profile, update their display name on `/profile/update` with Better Auth's `updateUser`, and sign out.
+- After registration, users are signed out and redirected to the sign-in page, following the assignment requirements.
+- Email verification and password recovery are not implemented.
 
-## ☁️ Deployment (Vercel)
+## ☁️ Deployment on Vercel
 
-1. Push the repo to GitHub and import it in Vercel.
-2. Add the environment variables above (set `BETTER_AUTH_URL` to the deployed URL).
-3. In Google / GitHub OAuth settings, add the production callback URLs.
-4. In MongoDB Atlas, allow network access from Vercel (`0.0.0.0/0` for a student project).
-5. Deploy, then check `/`, a category, a product (signed in), `/signin`, `/profile`, a hard refresh on `/product/peyaj`, and mobile view.
+1. Push the project to GitHub and import the repository into Vercel.
+2. Configure the required environment variables for the appropriate deployment environments.
+3. Set `BETTER_AUTH_URL` to the production domain for Production deployments.
+4. Register the correct production OAuth callback URLs with Google and GitHub.
+5. Configure MongoDB Atlas network access and database permissions appropriately.
+6. Deploy the application and verify authentication, profile updates, product browsing, and protected routes.
+7. Ensure Production deployment protection is configured to allow public visitors to access the live website.
 
-## 📁 Project structure
+## 📁 Project Structure
 
-```
+```text
 src/
-  app/            routes (home, category, product, signin, signup, profile, api/auth)
-  components/     Navbar, PriceTicker, Hero, ProductCard, forms, skeletons, …
-  lib/            api.ts, auth.ts, auth-client.ts, session.ts, format.ts (Bengali numerals, sorting)
+├── app/
+│   ├── page.tsx
+│   ├── category/[slug]/
+│   ├── product/[slug]/
+│   ├── signin/
+│   ├── signup/
+│   ├── profile/
+│   ├── profile/update/
+│   └── api/auth/[...all]/
+├── components/
+│   ├── Navbar
+│   ├── PriceTicker
+│   ├── Hero
+│   ├── ProductCard
+│   └── Forms, skeletons, and shared UI
+└── lib/
+    ├── api.ts
+    ├── auth.ts
+    ├── auth-client.ts
+    ├── session.ts
+    └── format.ts
 ```
 
-## 🧮 Notes on the numbers
+*Note: The structure above is a high-level overview; exact filenames and nesting may vary.*
+
+## 🧮 Price Calculation and Formatting
+
+- Prices are stored and sorted as numeric values; Bengali numerals are applied only during display formatting.
+- **Minimum price:** The lowest reported market minimum.
+- **Maximum price:** The highest reported market maximum.
+- **Average price:** The mean of the midpoint prices across the reported markets.
+- In the market-wise table, each row's **average** is `(minimum + maximum) / 2`, and rows are sorted from the lowest to the highest average.
+
+---
+
+**Developed by Talha Talukdar**  
+BSc in Computer Science and Engineering | Software Engineering  
+American International University-Bangladesh (AIUB)
