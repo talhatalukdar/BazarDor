@@ -7,7 +7,7 @@ import { MongoClient } from "mongodb";
 /**
  * Reuse one MongoClient across hot reloads / warm serverless invocations.
  * The fallback URI only keeps `next build` working without env vars; real
- * requests need MONGODB_URI (see .env.example).
+ * requests need MONGODB_URI.
  */
 const globalForMongo = globalThis as unknown as {
   mongoClient?: MongoClient;
@@ -64,6 +64,7 @@ export const auth = betterAuth({
     accountLinking: {
       enabled: true,
       trustedProviders: ["google"],
+      disableImplicitLinking: false,
     },
   },
 
