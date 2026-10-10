@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Avatar } from "@/components/AuthMenu";
 import SignOutButton from "@/components/SignOutButton";
-import UpdateProfileForm from "@/components/UpdateProfileForm";
 import { requireSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -26,9 +26,24 @@ export default async function ProfilePage() {
         <SignOutButton />
       </section>
 
-      <section className="mt-6 rounded-3xl border border-line bg-card p-6 sm:p-8">
-        <h2 className="mb-5 text-lg font-semibold">তথ্য</h2>
-        <UpdateProfileForm currentName={user.name} />
+      <section className="mt-6 rounded-3xl border border-line bg-card p-6">
+        <h2 className="text-lg font-semibold">তথ্য</h2>
+        <dl className="mt-4 space-y-3 text-sm">
+          <div className="flex justify-between gap-4 border-b border-line pb-3">
+            <dt className="text-muted">নাম</dt>
+            <dd className="font-medium">{user.name}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">ইমেইল</dt>
+            <dd className="font-medium break-all">{user.email}</dd>
+          </div>
+        </dl>
+        <Link
+          href="/profile/update"
+          className="mt-6 block rounded-lg bg-brand px-4 py-3 text-center font-semibold text-white shadow-md transition-colors hover:bg-brand-dark"
+        >
+          আপডেট
+        </Link>
       </section>
     </div>
   );
