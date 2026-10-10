@@ -15,7 +15,7 @@ Built for **Programming Hero – Batch 14, Assignment 7**.
 2. **Category Browsing** — Explore products by category, navigate with active-link indicators, sort prices from low to high or high to low, and view loading skeletons while data loads.
 3. **Protected Product Details** — Authenticated users can view a breadcrumb, today's price with its change, minimum / maximum / average price cards, and a market-wise price table (market, division, minimum, maximum, average). Access is protected through server-side session checks.
 4. **Multiple Authentication Options** — Sign up and sign in using email and password, Google, or GitHub, powered by Better Auth.
-5. **Profile Management** — View account information, update your display name through a dedicated profile update page using Better Auth's `updateUser`, and sign out securely.
+5. **Profile Management** — View account information, update your display name and profile photo through a dedicated profile update page using Better Auth's `updateUser`, and sign out securely.
 6. **Form Validation and Feedback** — Get validation messages and toast notifications for authentication and profile actions.
 7. **Responsive User Interface** — Designed for mobile phones, tablets, and desktops, with friendly error and not-found pages.
 8. **Resilient API Integration** — Validates API responses, caches data for five minutes, and supports a fallback API host when the primary host fails.
@@ -47,7 +47,7 @@ Built for **Programming Hero – Batch 14, Assignment 7**.
 | `/signin` | Public | Sign in with email/password, Google, or GitHub |
 | `/signup` | Public | Create an account |
 | `/profile` | Login required | View account details and sign out |
-| `/profile/update` | Login required | Update your display name |
+| `/profile/update` | Login required | Update your display name and profile photo |
 | Any unmatched route | Public | Custom 404 page with a link back to the homepage |
 
 ## 🚀 Getting Started
@@ -163,7 +163,7 @@ API requests are handled through `src/lib/api.ts`. The API utility validates res
 - Supported sign-in methods include email/password, Google, and GitHub.
 - Protected pages perform server-side session checks through `requireSession()` in `src/lib/session.ts`.
 - Unauthenticated users accessing protected pages are redirected to `/signin?callbackUrl=…`, where a toast explains that login is required.
-- Signed-in users can view their profile, update their display name on `/profile/update` with Better Auth's `updateUser`, and sign out.
+- Signed-in users can view their profile, update their display name and profile photo on `/profile/update` with Better Auth's `updateUser`, and sign out. Photos are center-cropped and resized to 256×256 in the browser before being saved.
 - After registration, users are signed out and redirected to the sign-in page, following the assignment requirements.
 - Email verification and password recovery are not implemented.
 
